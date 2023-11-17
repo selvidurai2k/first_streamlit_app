@@ -8,6 +8,12 @@ def get_fruityvice_data(this_fruit_choice):
   fruityvice_response = requests.get("https://fruityvice.com/api/fruit/"+this_fruit_choice)
   fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
   return fruityvice_normalized
+
+def get_fruit_load_list():
+  with my_cnx.cursor() as my_cur:
+    my_cur.execute("SELECT * from fruit_load_list")
+    return my_cur.fetchall()
+    
 my_fruit_list = pandas.read_csv("https://uni-lab-files.s3.us-west-2.amazonaws.com/dabw/fruit_macros.txt")
 my_fruit_list = my_fruit_list.set_index('Fruit')
 st.title('My Moms New Healthy Diner')
@@ -39,7 +45,7 @@ except URLError as e:
   st.error()
 
 
-st.stop()
+
 
 
 
@@ -49,14 +55,12 @@ st.stop()
 # displays the normalized data
 
 
+if st.button('Get fruit load list'):
+  my_cnx = snowflake.connector.connect(**st.secrets["snowflake"])
+  my_data_row = get_fruit_load_list()
+  st.dataframe(my_data_row)
 
-my_cnx = snowflake.connector.connect(**st.secrets["snowflake"])
-my_cur = my_cnx.cursor()
-my_cur.execute("SELECT * from fruit_load_list")
-my_data_row = my_cur.fetchall()
-st.header("The fruit load list contains:")
-st.dataframe(my_data_row)
-
+st.stop()
 add_my_fruit=st.text_input('Which fruit would you like to add ?','Kiwi')
 st.write('Thanks for adding ',add_my_fruit)
 my_cur.execute("insert into PC_RIVERY_DB.PUBLIC.FRUIT_LOAD_LIST values ('from streamlit')")
