@@ -16,8 +16,8 @@ def get_fruit_load_list():
 
 def insert_row_snowflake(new_fruit):
   with my_cnx.cursor() as my_cur:
-    my_cur.execute("insert into PC_RIVERY_DB.PUBLIC.FRUIT_LOAD_LIST values ('from streamlit')")
-    return "Thanks for adding" + new_fruit
+    my_cur.execute("insert into PC_RIVERY_DB.PUBLIC.FRUIT_LOAD_LIST values ('" + new_fruit + "')")
+    return "Thanks for adding " + new_fruit
     
 my_fruit_list = pandas.read_csv("https://uni-lab-files.s3.us-west-2.amazonaws.com/dabw/fruit_macros.txt")
 my_fruit_list = my_fruit_list.set_index('Fruit')
@@ -49,10 +49,12 @@ try:
 except URLError as e:
   st.error()
 
+st.header("View our fruit list - Add your favourites!")
 
-if st.button('Get fruit load list'):
+if st.button('Get fruit list'):
   my_cnx = snowflake.connector.connect(**st.secrets["snowflake"])
   my_data_row = get_fruit_load_list()
+  my_cnx.close()
   st.dataframe(my_data_row)
 
 add_my_fruit=st.text_input('Which fruit would you like to add ?')
@@ -60,6 +62,7 @@ add_my_fruit=st.text_input('Which fruit would you like to add ?')
 if st.button('Add a fruit to the list'):
   my_cnx = snowflake.connector.connect(**st.secrets["snowflake"])  
   back_from_func=insert_row_snowflake(add_my_fruit)
+  my_cnx.close()
   st.text(back_from_func)
 
 
