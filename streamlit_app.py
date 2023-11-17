@@ -22,7 +22,7 @@ st.header("Fruityvice Fruit Advice!")
 
 import requests
 fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
-st.text(fruityvice_response.json())
+
 
 # show the output in a table  
 fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
